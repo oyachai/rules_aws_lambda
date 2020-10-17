@@ -1,0 +1,23 @@
+
+load("//aws_lambda:defs.bzl", "aws_lambda_package")
+load("@python_deps//:requirements.bzl", "requirement")
+
+py_library(
+    name = "hello_world_lib",
+    srcs = glob(['*.py']),
+    deps = [
+        "//examples/python/lib:lib",
+        requirement("requests"),
+    ]
+)
+
+py_binary(
+    name = "hello_world",
+    srcs = ["hello_world.py"],
+    deps = [":hello_world_lib"],
+)
+
+aws_lambda_package(
+    name = "hello_world_pkg",
+    py_library = ":hello_world_lib",
+)

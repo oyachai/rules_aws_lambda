@@ -1,0 +1,10 @@
+load("@python_deps//:requirements.bzl", "requirement")
+
+py_library(
+    name = "lib",
+    srcs = glob(['*.py']),
+    deps = [
+        requirement("pytz"),
+    ],
+    visibility = ["//visibility:public"]
+)
