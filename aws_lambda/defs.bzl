@@ -1,8 +1,16 @@
+load("@build_bazel_rules_nodejs//:providers.bzl", "DeclarationInfo", "JSModuleInfo")
 
 def _remove_external_dir(path):
     if path.startswith("external/"):
         return "/".join(path.split("/")[3:])
     return path
+
+
+def _remove_bazel_out_dir(path):
+    if path.startswith("bazel-out/"):
+        return "/".join(path.split("/")[3:])
+    return path
+
 
 def _py_lambda(ctx):
     binary = ctx.files.py_library
@@ -39,14 +47,52 @@ def _py_lambda(ctx):
     return [DefaultInfo(files = depset([ctx.outputs.zip]))]
 
 
+def _nodejs_lambda(ctx):
+    binary = ctx.files.nodejs_library
+    zipper_args = ctx.actions.args()
+    zipper_args.add("c", ctx.outputs.zip.path)
+
+    for x in binary:
+        print(x)
+        print(x.path)
+        zipper_args.add("{}={}".format(_remove_bazel_out_dir(x.path), x.path))
+
+    print(ctx.attr.nodejs_library)
+    print(ctx.attr.nodejs_library[JSModuleInfo])
+
+    print()
+    runfiles = ctx.attr.nodejs_library[JSModuleInfo].sources.to_list()
+    runfiles += ctx.attr.nodejs_library[DeclarationInfo].transitive_declarations.to_list()
+    modules = {}
+    for x in runfiles:
+        print(x)
+        zipper_args.add("{}={}".format(_remove_bazel_out_dir(x.path), x.path))
+
+    zipper_inputs = [x for x in binary]
+    zipper_inputs += runfiles
+
+    ctx.actions.run(
+        inputs = zipper_inputs,
+        outputs = [ctx.outputs.zip],
+        executable = ctx.executable._zipper,
+        arguments = [zipper_args],
+        progress_message = "Creating zip...",
+        mnemonic = "zipper",
+    )
+    return [DefaultInfo(files = depset([ctx.outputs.zip]))]
+
+
 def _lambda_impl(ctx):
     if ctx.attr.py_library:
         return _py_lambda(ctx)
+    elif ctx.attr.nodejs_library:
+        return _nodejs_lambda(ctx)
 
 
 aws_lambda_package = rule(
     attrs = {
         "py_library": attr.label(),
+        "nodejs_library": attr.label(),
         "_zipper": attr.label(default = Label("@bazel_tools//tools/zip:zipper"), cfg = "host", executable=True),
     },
     outputs = {"zip": "%{name}.zip"},

@@ -1,0 +1,24 @@
+load("@npm//@bazel/typescript:index.bzl", "ts_library", "ts_devserver")
+load("@build_bazel_rules_nodejs//:index.bzl", "nodejs_binary")
+load("//aws_lambda:defs.bzl", "aws_lambda_package")
+
+ts_library(
+  name = "hello_world",
+  srcs = ["hello_world.ts"],
+  deps = [
+      "//examples/nodejs/lib:hello_lib",
+      "@npm//@types/lodash",
+      "@npm//lodash",
+  ],
+)
+
+nodejs_binary(
+    name = "hello_world_bin",
+    entry_point = ":hello_world.ts",
+    data = [":hello_world"],
+)
+
+aws_lambda_package(
+    name = "hello_world_pkg",
+    nodejs_library = ":hello_world",
+)
