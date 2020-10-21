@@ -5,6 +5,10 @@ def _remove_external_dir(path):
         return "/".join(path.split("/")[3:])
     return path
 
+def _remove_external_dir_node(path):
+    if path.startswith("external/npm"):
+        return "/".join(path.split("/")[2:])
+    return path
 
 def _remove_bazel_out_dir(path):
     if path.startswith("bazel-out/"):
@@ -52,21 +56,14 @@ def _nodejs_lambda(ctx):
     zipper_args = ctx.actions.args()
     zipper_args.add("c", ctx.outputs.zip.path)
 
-    for x in binary:
-        print(x)
-        print(x.path)
-        zipper_args.add("{}={}".format(_remove_bazel_out_dir(x.path), x.path))
-
-    print(ctx.attr.nodejs_library)
-    print(ctx.attr.nodejs_library[JSModuleInfo])
-
-    print()
     runfiles = ctx.attr.nodejs_library[JSModuleInfo].sources.to_list()
     runfiles += ctx.attr.nodejs_library[DeclarationInfo].transitive_declarations.to_list()
     modules = {}
     for x in runfiles:
-        print(x)
-        zipper_args.add("{}={}".format(_remove_bazel_out_dir(x.path), x.path))
+        zip_path = _remove_external_dir_node(_remove_bazel_out_dir(x.path))
+        if not x.is_source:
+            zip_path = ctx.workspace_name + '/' + zip_path
+        zipper_args.add("{}={}".format(zip_path, x.path))
 
     zipper_inputs = [x for x in binary]
     zipper_inputs += runfiles

@@ -20,7 +20,8 @@
     "paths": {
       "@/*": ["src/*"],
       "@tests/*": ["tests/*"],
-      "@templates/*": ["templates/*"]
+      "@templates/*": ["templates/*"],
+      "io_bazel_rules_aws_lambda/*": ["*"]
     },
     "lib": [
       "esnext",
@@ -34,6 +35,5 @@
   ],
   "exclude": [
     "node_modules",
-    "pulse-lambda-common/lib"
   ]
 }
