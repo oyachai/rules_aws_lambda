@@ -5,7 +5,7 @@ This repository contains bazel rules to create packages suitable for uploading t
 ## Setup
 In your `WORKSPACE` file:
 ```
-rules_version="7a4c548db7ceba7a997cc4ef3d21954700782ef5" # update this as needed
+rules_version="e9d4bbaf4c359db7b8276babb0b82c7acde5934d" # update this as needed
 
 http_archive(
     name = "io_bazel_rules_aws_lambda",
