@@ -1,0 +1,39 @@
+{
+  "compilerOptions": {
+    "target": "esnext",
+    "module": "esnext",
+    "strict": true,
+    "jsx": "preserve",
+    "importHelpers": true,
+    "moduleResolution": "node",
+    "experimentalDecorators": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "allowJs": false,
+    "sourceMap": true,
+    "baseUrl": ".",
+    "skipLibCheck": true,
+    "types": [
+      "node",
+      "jest"
+    ],
+    "paths": {
+      "@/*": ["src/*"],
+      "@tests/*": ["tests/*"],
+      "@templates/*": ["templates/*"],
+      "io_bazel_rules_aws_lambda/*": ["*"]
+    },
+    "lib": [
+      "esnext",
+      "dom"
+    ]
+  },
+  "include": [
+    "src/**/*.ts",
+    "tests/**/*.ts",
+    "__mocks__/**/*.ts",
+  ],
+  "exclude": [
+    "node_modules",
+  ]
+}
