@@ -8,6 +8,7 @@ py_library(
     deps = [
         "//examples/python/lib:lib",
         requirement("requests"),
+        requirement("boto3"),
     ]
 )
 

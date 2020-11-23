@@ -1,0 +1,21 @@
+load("//aws_lambda:defs.bzl", "aws_lambda_package")
+
+java_library(
+    name = "hello_world_lib",
+    srcs = ["HelloWorld.java"],
+    deps = [
+        "@maven//:com_amazonaws_aws_lambda_java_core",
+    ],
+)
+java_binary(
+    name = "hello_world",
+    runtime_deps = [
+        ":hello_world_lib",
+    ],
+    main_class = "examples.java.HelloWorld"
+)
+
+aws_lambda_package(
+    name = "hello_world_pkg",
+    java_binary = ":hello_world_deploy.jar",
+)
