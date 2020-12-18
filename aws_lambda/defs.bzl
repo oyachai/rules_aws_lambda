@@ -31,7 +31,7 @@ def _py_lambda(ctx):
                 modules[current_dir + directory + "/"] = 1
                 current_dir += directory + "/"
             print(x.path)
-        zip_filelist.append("{}={}".format(_remove_external_dir(_remove_bazel_out_dir(x.path)), x.path))
+        zip_filelist.append("{}={}".format(_remove_external_dir(x.path), x.path))
 
     # Add __init__.py files to all the non-external modules we've discovered
     for module in modules.keys():
