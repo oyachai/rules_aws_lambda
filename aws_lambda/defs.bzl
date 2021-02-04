@@ -44,7 +44,7 @@ def _py_lambda(ctx):
     zipper_inputs += [zipper_filelist_input]
 
     zipper_args = ctx.actions.args()
-    zipper_args.add("c", output.path)
+    zipper_args.add("Cc" if ctx.attr.compress else "c", output.path)
     zipper_args.add("@{}".format(zipper_filelist_input.path))
 
     ctx.actions.run(
@@ -64,7 +64,9 @@ def _nodejs_lambda(ctx):
     output = ctx.actions.declare_file("{}.awslambda.zip".format(ctx.label.name))
 
     runfiles = ctx.attr.nodejs_library[JSModuleInfo].sources.to_list()
-    runfiles += ctx.attr.nodejs_library[DeclarationInfo].transitive_declarations.to_list()
+    if ctx.attr.declaration_info:
+        runfiles += ctx.attr.nodejs_library[DeclarationInfo].transitive_declarations.to_list()
+
     modules = {}
     zip_filelist = []
     for x in runfiles:
@@ -81,7 +83,7 @@ def _nodejs_lambda(ctx):
     zipper_inputs += [zipper_filelist_input]
 
     zipper_args = ctx.actions.args()
-    zipper_args.add("c", output.path)
+    zipper_args.add(("Cc" if ctx.attr.compress else "c"), output.path)
     zipper_args.add("@{}".format(zipper_filelist_input.path))
 
     ctx.actions.run(
@@ -112,6 +114,7 @@ def _lambda_impl(ctx):
         return _nodejs_lambda(ctx)
     elif ctx.attr.java_binary:
         return _jvm_lambda(ctx)
+    return []
 
 
 aws_lambda_package = rule(
@@ -120,6 +123,8 @@ aws_lambda_package = rule(
         "nodejs_library": attr.label(),
         "java_binary": attr.label(allow_files = True),
         "_zipper": attr.label(default = Label("@bazel_tools//tools/zip:zipper"), cfg = "host", executable=True),
+        "declaration_info": attr.bool(default=False),
+        "compress": attr.bool(default=True),
     },
 #    outputs = {
 #        "zip": "%{name}.zip",
