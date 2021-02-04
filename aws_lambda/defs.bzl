@@ -44,7 +44,7 @@ def _py_lambda(ctx):
     zipper_inputs += [zipper_filelist_input]
 
     zipper_args = ctx.actions.args()
-    zipper_args.add("Cc" if ctx.attr.compress else "c"), output.path)
+    zipper_args.add(("Cc" if ctx.attr.compress else "c"), output.path)
     zipper_args.add("@{}".format(zipper_filelist_input.path))
 
     ctx.actions.run(
